@@ -1,6 +1,6 @@
 # quantum-teleportation-simulator
 An educational Qiskit simulation of quantum teleportation using entanglement, Bell-basis measurement, classical feed-forward, and conditional quantum corrections.
-# ⚛️ Quantum Teleportation Simulator
+
 
 # ⚛️ Quantum Teleportation Simulator
 

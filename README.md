@@ -757,16 +757,14 @@ quantum-teleportation-simulator/
 │
 ├── README.md
 ├── requirements.txt
-├── LICENSE
 │
 ├── src/
-│   └── quantum_teleportation.py
+│   └── quantum_teleportation_simulator.py
 │
 ├── images/
 │   ├── teleportation_circuit.png
 │   ├── teleportation_code.png
 │   ├── teleportation_principle.png
-│   └── simulation_results.png
 │
 └── results/
     └── example_output.txt

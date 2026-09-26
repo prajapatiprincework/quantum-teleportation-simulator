@@ -1,0 +1,60 @@
+Quantum Teleportation Simulator - Example Result
+================================================
+
+Simulation backend:
+Qiskit Aer Simulator
+
+Number of shots:
+1000
+
+Example measurement counts:
+
+{'000': 116,
+ '010': 138,
+ '111': 142,
+ '100': 130,
+ '110': 123,
+ '101': 129,
+ '001': 120,
+ '011': 102}
+
+Qiskit displays classical bits in the order:
+
+c2 c1 c0
+
+Therefore, for an output such as:
+
+101
+
+we have:
+
+c2 = 1  -> Bob's final measurement
+c1 = 0  -> Alice's second measurement
+c0 = 1  -> Alice's first measurement
+
+Alice's measurement result is therefore:
+
+c1 c0 = 01
+
+For this circuit convention:
+
+00 -> No correction
+01 -> Z correction
+10 -> X correction
+11 -> X + Z correction
+
+Important:
+The exact counts change from run to run because quantum measurement is probabilistic.
+
+The current circuit prepares Alice's input as:
+
+|+> = (|0> + |1>) / sqrt(2)
+
+The simulation demonstrates the quantum teleportation protocol using:
+
+1. Superposition
+2. Bell-state entanglement
+3. Bell-basis measurement
+4. Classical communication
+5. Conditional X/Z corrections
+6. Bob's final measurement

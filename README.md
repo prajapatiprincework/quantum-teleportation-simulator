@@ -757,18 +757,19 @@ quantum-teleportation-simulator/
 │
 ├── README.md
 ├── requirements.txt
+├── LICENSE
 │
 ├── src/
-│   └── quantum_teleportation_simulator.py
+│   └── quantum_teleportation.py
 │
 ├── images/
-│   ├── teleportation_circuit.png.png
-│   ├── teleportation_code(1).png.png
-│   ├── teleportation_code(2).png.png
-│   ├── teleportation_principle.png.jpg
+│   ├── teleportation_circuit.png
+│   ├── teleportation_code.png
+│   ├── teleportation_principle.png
+│   └── simulation_results.png
 │
 └── results/
-    └── result.txt
+    └── example_output.txt
 ```
 
 ---
@@ -778,7 +779,7 @@ quantum-teleportation-simulator/
 ## Clone the repository
 
 ```bash
-git clone https://prajapatiprincework/quantum-teleportation-simulator.git
+git clone https://github.com/YOUR-USERNAME/quantum-teleportation-simulator.git
 ```
 
 ## Enter the project directory
@@ -823,16 +824,15 @@ pip install -r requirements.txt
 
 ## Quantum Teleportation Circuit
 
-![Quantum Teleportation Circuit](images/teleportation_circuit.png.png)
+![Quantum Teleportation Circuit](images/teleportation_circuit.png)
 
 ## Qiskit Implementation
 
-![Qiskit Implementation](images/teleportation_code(1).png.png)
-![Qiskit Implementation](images/teleportation_code(2).png.png)
+![Qiskit Implementation](images/teleportation_code.png)
 
 ## Quantum Teleportation Principle
 
-![Quantum Teleportation Principle](images/teleportation_principle.png.jpg)
+![Quantum Teleportation Principle](images/teleportation_principle.png)
 
 ---
 

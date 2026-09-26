@@ -1,431 +1,401 @@
-# quantum-teleportation-simulator
-An educational Qiskit simulation of quantum teleportation using entanglement, Bell-basis measurement, classical feed-forward, and conditional quantum corrections.
-
-
 # ⚛️ Quantum Teleportation Simulator
 
-A Qiskit-based simulation of the **Quantum Teleportation Protocol** using
-Python, Qiskit, Qiskit Aer, and NumPy.
+A Qiskit-based simulation of the **Quantum Teleportation Protocol** using Python, Qiskit, Qiskit Aer, and NumPy.
 
-This project was built to understand how an unknown quantum state can be
-transferred from one qubit to another using **quantum entanglement,
-measurement, classical communication, and conditional quantum operations**.
+This is my first quantum-computing project, built to understand the complete working of quantum teleportation — from creating entanglement to measurement, classical communication, conditional quantum operations, and Bob's final state.
 
 ---
 
 ## 📌 Project Overview
 
-Quantum teleportation is a quantum-information protocol that transfers the
-**quantum state** of one qubit to another distant qubit.
+Quantum teleportation is a quantum-information protocol that transfers the **quantum state** of one qubit to another qubit.
 
-The protocol does NOT physically transport the original qubit.
+It does **not** physically send the original qubit from Alice to Bob.
 
-Instead, it uses:
+Instead, the protocol uses:
 
-1. An unknown quantum state
-2. A shared entangled pair
-3. Two classical bits of information
-4. Conditional quantum operations
+- An input quantum state
+- A shared entangled Bell pair
+- Two classical bits
+- Conditional quantum operations
 
-The original quantum state is destroyed during Alice's measurement, while
-Bob's qubit is transformed into the original state.
+If Alice initially has an unknown state
 
-### Important
+**|ψ⟩ = α|0⟩ + β|1⟩**
 
-Quantum teleportation does **not** allow faster-than-light communication.
+the goal is to reproduce the same state on Bob's qubit.
 
-Alice must communicate her two classical measurement results to Bob before
-Bob can apply the required corrections.
+The original state is destroyed during Alice's measurement, while Bob's qubit is transformed into the original state.
+
+> **Important:** Quantum teleportation does not allow faster-than-light communication. Alice must communicate her two classical measurement results to Bob.
 
 ---
 
-# 🧠 Basic Quantum State
+# 🧠 1. Quantum State
 
 A general single-qubit state can be written as:
 
-```text
-|ψ⟩ = α|0⟩ + β|1
+**|ψ⟩ = α|0⟩ + β|1⟩**
 
+where α and β are probability amplitudes.
 
-where:
-α and β are complex probability amplitudes
-and they satisfy:|α|² + |β|² = 1
+They satisfy the normalization condition:
 
-The probability of measuring:
+**|α|² + |β|² = 1**
 
-0 → |α|²
+Therefore:
 
-1 → |β|²
+- Probability of measuring `0` = **|α|²**
+- Probability of measuring `1` = **|β|²**
 
 For example:
 
-|ψ⟩ = √0.8 |0⟩ + √0.2 |1⟩
+**|ψ⟩ = √0.8|0⟩ + √0.2|1⟩**
 
-means:
+gives:
 
-P(0) = 0.8
-P(1) = 0.2
+- **P(0) = 0.8**
+- **P(1) = 0.2**
 
-🎯 Objective of the Project
+---
 
-The objective is to start with an input quantum state on Alice's qubit
-|ψ⟩ = α|0⟩ + β|1⟩
-and reproduce the same quantum state on Bob's qubit:Input:
+# 🎯 2. Objective
 
-Alice
- |ψ⟩
-  |
-  | Quantum Teleportation
-  ↓
-Bob
- |ψ⟩The physical qubit itself is not sent from Alice to Bob.
+The objective of the project is to start with a quantum state on Alice's qubit:
 
-Only:
+**|ψ⟩ = α|0⟩ + β|1⟩**
 
-Quantum entanglement
-        +
-2 classical bits
-        +
-Conditional X/Z corrections
+and reconstruct that state on Bob's qubit.
 
-🧩 Qubits Used in This Project
+Conceptually:
 
-The circuit contains three qubits:
+**Alice: |ψ⟩**
 
-q0 → Alice's unknown/input qubit
+↓
 
-q1 → Alice's half of the entangled Bell pair
+**Quantum Teleportation Protocol**
 
-q2 → Bob's half of the entangled Bell pair
+↓
 
-There are also three classical bits:
+**Bob: |ψ⟩**
 
-c0 → Alice's first measurement result
+The physical qubit is not transported from Alice to Bob.
 
-c1 → Alice's second measurement result
+The protocol uses:
 
-c2 → Bob's final measurement result
+**Entanglement + Classical Communication + Quantum Corrections**
 
-The circuit therefore has:
+---
 
-3 quantum bits
-3 classical bits
-🔬 Quantum Teleportation Protocol
+# 🧩 3. Qubits and Classical Bits
 
-The complete protocol can be divided into four major stages:
+This project uses **3 quantum bits** and **3 classical bits**.
 
-1. Prepare Alice's quantum state
+| Qubit | Role |
+|---|---|
+| `q0` | Alice's input quantum state |
+| `q1` | Alice's half of the entangled pair |
+| `q2` | Bob's half of the entangled pair |
 
-2. Create an entangled Bell pair
+The classical bits are:
 
-3. Alice performs a Bell-basis measurement
+| Classical Bit | Role |
+|---|---|
+| `c0` | Alice's first measurement result |
+| `c1` | Alice's second measurement result |
+| `c2` | Bob's final measurement result |
 
-4. Bob applies X/Z corrections using Alice's classical bits
+---
 
-Finally, Bob measures his qubit.
+# 🔗 4. Creating the Entangled Bell Pair
 
-1️⃣ Prepare Alice's Quantum State
+Alice and Bob first create a shared entangled state between `q1` and `q2`.
 
-The circuit initially starts in:
+Initially:
 
-|000⟩
+**|00⟩**
 
-which means that all three qubits are initially in the |0⟩ state.
+Apply a Hadamard gate to `q1`:
 
-For example, applying:
-
-qc.x(0)
-
-changes Alice's qubit from:
-
-|0⟩
-
-to:
-
-|1⟩
-
-A Hadamard gate can instead create an equal superposition:
-
-qc.h(0)
-
-which produces:
-
-|+⟩ = (|0⟩ + |1⟩) / √2
-
-For a more general real-amplitude state, the Ry gate can be used:
-
-qc.ry(theta, 0)
-
-which produces:
-
-|ψ⟩ = cos(theta/2)|0⟩ + sin(theta/2)|1⟩
-2️⃣ Create the Entangled Bell Pair
-
-Alice and Bob first need a shared entangled state.
-
-The circuit uses qubits q1 and q2.
-
-First:
-
+```python
 qc.h(1)
+```
 
-The Hadamard gate creates:
+The Hadamard gate transforms:
 
-|0⟩ → (|0⟩ + |1⟩) / √2
+**|0⟩ → (|0⟩ + |1⟩) / √2**
 
-Therefore the two-qubit state becomes:
+The two-qubit state becomes:
 
-(|00⟩ + |10⟩) / √2
+**(|00⟩ + |10⟩) / √2**
 
-Then we apply:
+Now apply a CNOT gate:
 
+```python
 qc.cx(1, 2)
+```
 
-This creates the Bell state:
+The resulting state is:
 
-|Φ⁺⟩ = (|00⟩ + |11⟩) / √2
+**|Φ⁺⟩ = (|00⟩ + |11⟩) / √2**
 
-This is an entangled state.
+This is one of the four Bell states.
 
-The important feature is that the two qubits are no longer independently
-described by separate states.
+The two qubits are now entangled.
 
-They form one combined quantum state.
+---
 
-🔗 Bell State
+# 🔬 5. Bell State
 
 The Bell state used in this project is:
 
-|Φ⁺⟩ = (|00⟩ + |11⟩) / √2
+**|Φ⁺⟩ = (|00⟩ + |11⟩) / √2**
 
-There are four standard Bell states:
+The four standard Bell states are:
 
-|Φ⁺⟩ = (|00⟩ + |11⟩) / √2
+- **|Φ⁺⟩ = (|00⟩ + |11⟩) / √2**
+- **|Φ⁻⟩ = (|00⟩ − |11⟩) / √2**
+- **|Ψ⁺⟩ = (|01⟩ + |10⟩) / √2**
+- **|Ψ⁻⟩ = (|01⟩ − |10⟩) / √2**
 
-|Φ⁻⟩ = (|00⟩ - |11⟩) / √2
+This project uses **|Φ⁺⟩** as the shared entanglement resource.
 
-|Ψ⁺⟩ = (|01⟩ + |10⟩) / √2
+---
 
-|Ψ⁻⟩ = (|01⟩ - |10⟩) / √2
+# 👤 6. Alice's Input State
 
-This project uses:
+The circuit initially starts in:
 
-|Φ⁺⟩
-3️⃣ Alice's Bell-Basis Measurement
+**|000⟩**
 
-Alice now has:
+Therefore every qubit starts in the `|0⟩` state.
 
-q0 → unknown state |ψ⟩
+In the current implementation:
 
-q1 → Alice's half of Bell pair
+```python
+qc.h(0)
+```
+
+This prepares Alice's qubit in:
+
+**|+⟩ = (|0⟩ + |1⟩) / √2**
+
+So the current version of the project demonstrates teleportation of the **|+⟩ state**.
+
+The circuit can later be extended to arbitrary single-qubit states.
+
+---
+
+# 📐 7. Alice's Bell-Basis Operation
+
+Alice has:
+
+- `q0` → input state
+- `q1` → her half of the Bell pair
 
 Bob has:
 
-q2 → Bob's half of Bell pair
+- `q2` → his half of the Bell pair
 
-Alice performs:
+Alice applies:
 
+```python
 qc.cx(0, 1)
 qc.h(0)
+```
 
-These operations transform Alice's two qubits into a basis suitable
-for Bell-state measurement.
+These operations transform Alice's two qubits into the Bell-measurement basis.
 
-Alice then measures:
+Alice then measures both qubits:
 
+```python
 qc.measure(0, 0)
 qc.measure(1, 1)
+```
 
-This produces two classical bits:
+The measurements produce two classical bits:
 
-c0
-c1
+**c0** and **c1**
 
 There are four possible combinations:
 
-00
-01
-10
-11
+| `c1 c0` | Bob's correction |
+|---|---|
+| `00` | None |
+| `01` | Z |
+| `10` | X |
+| `11` | X + Z |
 
-These two bits contain the information Bob needs to determine which
-correction must be applied.
+---
 
-📡 4️⃣ Classical Communication
+# 📡 8. Classical Communication
 
-Alice sends her two classical measurement results to Bob.
+After Alice measures her two qubits, she obtains two classical bits.
+
+These bits are sent to Bob.
 
 The important distinction is:
 
-Quantum information:
-|ψ⟩
+**Quantum information:** the state `|ψ⟩`
 
-Classical information:
-c0, c1
+**Classical information:** the measurement results `c0` and `c1`
 
-The classical bits are not the quantum state.
+Alice does **not** send the original qubit to Bob.
 
-They only tell Bob which operation he needs to perform on his qubit.
+She sends only the two classical measurement results.
 
-5️⃣ Bob's Conditional Corrections
+Bob already possesses the other half of the entangled pair.
 
-Bob's qubit may have one of four related states depending on Alice's
-measurement result.
+---
 
-The required corrections are:
+# ⚙️ 9. Bob's Conditional Corrections
 
-Alice result     Bob correction
+Depending on Alice's measurement results, Bob's qubit may require an X and/or Z correction.
 
-c1 c0 = 00       I
+In this implementation:
 
-c1 c0 = 01       X
-
-c1 c0 = 10       Z
-
-c1 c0 = 11       XZ
-
-Here:
-
-I = Identity operation
-
-X = Pauli-X gate
-
-Z = Pauli-Z gate
-
-In this implementation, the Qiskit code is:
-
+```python
 with qc.if_test((qc.clbits[1], 1)):
     qc.x(2)
 
 with qc.if_test((qc.clbits[0], 1)):
     qc.z(2)
+```
 
 This means:
 
-If c1 = 1:
-    apply X to Bob's qubit
-
-If c0 = 1:
-    apply Z to Bob's qubit
+- If `c1 = 1` → apply **X** to Bob's qubit.
+- If `c0 = 1` → apply **Z** to Bob's qubit.
 
 Therefore:
 
-c1 = 0, c0 = 0
-→ no correction
+| `c1` | `c0` | Operation on Bob |
+|---:|---:|---|
+| 0 | 0 | None |
+| 0 | 1 | Z |
+| 1 | 0 | X |
+| 1 | 1 | X + Z |
 
-c1 = 0, c0 = 1
-→ Z correction
+After the correction, Bob's qubit contains the teleported state.
 
-c1 = 1, c0 = 0
-→ X correction
+---
 
-c1 = 1, c0 = 1
-→ X + Z correction
-⚠️ Important Note About Bit Ordering
+# 🔢 10. Understanding Qiskit's Bit Ordering
 
-Qiskit displays classical bits in reverse numerical order.
+One important detail in Qiskit is that classical bits are displayed in reverse numerical order.
 
-For example:
+For example, if the output is:
 
+```text
 101
+```
 
-is displayed as:
+Qiskit displays this as:
 
-c2 c1 c0
+**c2 c1 c0**
 
 Therefore:
 
-101
-
-means:
-
-c2 = 1
-c1 = 0
-c0 = 1
+- `c2 = 1`
+- `c1 = 0`
+- `c0 = 1`
 
 In this project:
 
-c0 → Alice's first measurement
-c1 → Alice's second measurement
-c2 → Bob's final measurement
+- `c0` → Alice's first measurement
+- `c1` → Alice's second measurement
+- `c2` → Bob's final measurement
 
-This is an important detail when interpreting the output.
+So `101` means:
 
-🧠 What Happens Mathematically?
+**Bob's final measurement = 1**
 
-Suppose Alice's original state is:
+and Alice's measurement result is:
 
-|ψ⟩ = α|0⟩ + β|1⟩
+**c1 c0 = 01**
 
-After Alice performs her Bell-basis operations and measurement,
-Bob's qubit becomes one of four related states.
+which corresponds to the **Z correction** in this circuit convention.
 
-Depending on Alice's two classical bits, Bob's state is:
+---
 
-00 → |ψ⟩
+# 🧮 11. Mathematical Picture of Teleportation
 
-01 → Z|ψ⟩
+Suppose Alice starts with:
 
-10 → X|ψ⟩
+**|ψ⟩ = α|0⟩ + β|1⟩**
 
-11 → XZ|ψ⟩
+and Alice and Bob share:
 
-Bob then applies the corresponding correction.
+**|Φ⁺⟩ = (|00⟩ + |11⟩) / √2**
 
-Because:
+The complete three-qubit state is:
 
-X² = I
+**|ψ⟩ ⊗ |Φ⁺⟩**
 
-Z² = I
+After Alice performs the Bell-basis operations and measurement, Bob's qubit becomes one of four related states.
 
-the unwanted transformation can be removed.
+The four possibilities are:
 
-Finally:
+| Alice's result | Bob's state |
+|---|---|
+| `00` | `|ψ⟩` |
+| `01` | `Z|ψ⟩` |
+| `10` | `X|ψ⟩` |
+| `11` | `XZ|ψ⟩` |
 
-Bob → |ψ⟩
+Bob uses Alice's classical information to apply the appropriate correction.
 
-Therefore the quantum state has been transferred from Alice's qubit
-to Bob's qubit.
+The final result is:
 
-🚫 Teleportation Is NOT Cloning
+**Bob → |ψ⟩**
 
-Quantum teleportation does not make two copies of the original state.
+Therefore the quantum state has been transferred to Bob.
+
+---
+
+# 🚫 12. Teleportation Is Not Cloning
+
+Quantum teleportation does not create two copies of the original quantum state.
 
 Before Alice's measurement:
 
-Alice → |ψ⟩
-Bob   → entangled qubit
+**Alice → |ψ⟩**
+
+**Bob → entangled qubit**
 
 After Alice's measurement and Bob's correction:
 
-Alice → original state destroyed
+**Alice → original state destroyed**
 
-Bob   → |ψ⟩
+**Bob → |ψ⟩**
 
 Therefore:
 
-Original state is not copied.
+**Teleportation ≠ Copying**
 
-This is consistent with the no-cloning theorem.
+This is consistent with the **no-cloning theorem**.
 
-🌐 No Faster-Than-Light Communication
+---
 
-Quantum entanglement produces correlations between Alice and Bob,
-but Bob cannot use teleportation to receive usable information instantly.
+# 🌐 13. Why Classical Communication Is Required
 
-Alice still has to send:
+Although Alice and Bob share entanglement, Bob cannot simply measure his qubit and obtain Alice's state.
 
-2 classical bits
+Alice must communicate the two classical bits.
 
-to Bob.
+Therefore:
 
-Therefore the protocol respects the limitations imposed by
-relativistic causality.
+**Entanglement + 2 classical bits + Bob's conditional correction = Quantum Teleportation**
 
-💻 Qiskit Implementation
+This is why quantum teleportation cannot be used for faster-than-light communication.
 
-The core implementation is:
+---
 
+# 💻 14. Qiskit Implementation
+
+The current implementation is:
+
+```python
 import numpy as np
 
 from qiskit import QuantumCircuit
@@ -433,22 +403,24 @@ from qiskit_aer import AerSimulator
 
 
 # ============================================================
-# CREATE CIRCUIT
+# CREATE QUANTUM CIRCUIT
 # ============================================================
 
 qc = QuantumCircuit(3, 3)
 
 
 # ============================================================
-# PREPARE ALICE'S INPUT STATE
+# 1. PREPARE ALICE'S INPUT STATE
 # ============================================================
 
-# Example: prepare |1>
-qc.x(0)
+# Hadamard creates |+>
+# |+> = (|0> + |1>) / sqrt(2)
+
+qc.h(0)
 
 
 # ============================================================
-# CREATE BELL PAIR
+# 2. CREATE BELL STATE BETWEEN q1 AND q2
 # ============================================================
 
 qc.h(1)
@@ -458,7 +430,7 @@ qc.barrier()
 
 
 # ============================================================
-# ALICE'S BELL-BASIS MEASUREMENT
+# 3. ALICE'S BELL-BASIS OPERATIONS
 # ============================================================
 
 qc.cx(0, 1)
@@ -466,34 +438,40 @@ qc.h(0)
 
 qc.barrier()
 
+
+# ============================================================
+# 4. ALICE MEASURES HER TWO QUBITS
+# ============================================================
+
 qc.measure(0, 0)
 qc.measure(1, 1)
 
 
 # ============================================================
-# BOB'S CONDITIONAL CORRECTIONS
+# 5. BOB'S CONDITIONAL CORRECTIONS
 # ============================================================
 
-# If c1 = 1 → apply X
+# If c1 = 1 → apply X to Bob's qubit
 with qc.if_test((qc.clbits[1], 1)):
     qc.x(2)
 
-# If c0 = 1 → apply Z
+# If c0 = 1 → apply Z to Bob's qubit
 with qc.if_test((qc.clbits[0], 1)):
     qc.z(2)
+
 
 qc.barrier()
 
 
 # ============================================================
-# BOB'S FINAL MEASUREMENT
+# 6. BOB MEASURES HIS FINAL QUBIT
 # ============================================================
 
 qc.measure(2, 2)
 
 
 # ============================================================
-# SIMULATION
+# 7. RUN SIMULATION
 # ============================================================
 
 simulator = AerSimulator()
@@ -503,32 +481,41 @@ result = simulator.run(
     shots=1000
 ).result()
 
+
+# ============================================================
+# 8. GET RESULTS
+# ============================================================
+
 counts = result.get_counts()
-
-
-# ============================================================
-# OUTPUT
-# ============================================================
 
 print("Measurement results:")
 print(counts)
 
 print("\nQuantum circuit:")
 print(qc.draw())
-📊 Simulation
+```
+
+---
+
+# 📊 15. Simulation
 
 The circuit is simulated using:
 
+```python
 simulator = AerSimulator()
+```
 
-The number of repetitions is controlled using:
+The circuit is executed:
 
+```python
 shots=1000
+```
 
-This means that the circuit is executed 1000 times.
+This means the circuit is simulated **1000 times**.
 
-For example, the output may look like:
+The measurement results can look like:
 
+```text
 {
     '000': 116,
     '010': 138,
@@ -539,190 +526,349 @@ For example, the output may look like:
     '001': 120,
     '011': 102
 }
+```
 
-The exact numbers change between simulations because quantum measurement
-is probabilistic.
+The exact numbers vary because quantum measurement is probabilistic.
 
-📈 Understanding the Measurement Results
+---
 
-The three-bit output contains:
+# 📈 16. What Does the Output Mean?
 
-c2 c1 c0
+A three-bit result such as:
 
-For example:
-
+```text
 101
+```
 
-means:
+contains three classical measurement results:
 
-Bob's result     = 1
+**c2 c1 c0**
 
-Alice's c1       = 0
+For `101`:
 
-Alice's c0       = 1
+- `c2 = 1` → Bob's final measurement
+- `c1 = 0` → Alice's second measurement
+- `c0 = 1` → Alice's first measurement
 
 Therefore Alice's measurement result is:
 
-c1 c0 = 01
+**c1 c0 = 01**
 
-and according to this circuit's correction convention, Bob applies:
+and Bob's final measurement is:
 
-Z
+**c2 = 1**
 
-The important point is that the three-bit output should not be treated
-as one quantum state.
+The first two bits determine the correction Bob needed.
 
-Each bit has a separate role.
+The final bit is Bob's measurement outcome.
 
-🖼️ Circuit
+---
 
-The generated Qiskit circuit can be found in:
+# 🔬 17. Different Input States
 
-images/teleportation_circuit.png
+The input state can be changed by modifying the operations on `q0`.
 
-The circuit represents:
+## State |0⟩
 
-q0 → Alice's input qubit
+The circuit starts with:
 
-q1 → Alice's entangled qubit
+```python
+# q0 is already |0>
+```
 
-q2 → Bob's qubit
+No gate is required.
 
-c0, c1 → Alice's classical measurement results
+---
 
-c2 → Bob's final measurement
-📚 Concepts Demonstrated
-
-This project demonstrates the following concepts:
-
-1. Qubit initialization
-
-A Qiskit qubit starts in:
-
-|0⟩
-2. Quantum gates
-
-The project uses:
-
-H  → Hadamard gate
-
-X  → Pauli-X gate
-
-Z  → Pauli-Z gate
-
-CX → Controlled-X / CNOT gate
-3. Superposition
-
-The Hadamard gate creates:
-
-|+⟩ = (|0⟩ + |1⟩) / √2
-4. Entanglement
-
-The H + CNOT sequence creates the Bell state:
-
-|Φ⁺⟩ = (|00⟩ + |11⟩) / √2
-5. Measurement
-
-Measurement converts quantum information into classical information.
-
-6. Classical feed-forward
-
-Alice's measurement results control Bob's quantum operations.
-
-7. Quantum teleportation
-
-The quantum state is reconstructed on Bob's qubit.
-
-🧪 Different Input States
-
-The circuit can be modified to test different input states.
-
-State |0⟩
-
-No gate is required:
-
-# q0 starts as |0>
-State |1⟩
+## State |1⟩
 
 Apply:
 
+```python
 qc.x(0)
-Equal Superposition
+```
+
+This produces:
+
+**|1⟩**
+
+---
+
+## State |+⟩
 
 Apply:
 
+```python
 qc.h(0)
+```
 
-giving:
+This produces:
 
-|+⟩ = (|0⟩ + |1⟩) / √2
-Real-Amplitude Superposition
+**|+⟩ = (|0⟩ + |1⟩) / √2**
 
-Apply:
+This is the state used in the current version.
 
+---
+
+## General Real-Amplitude State
+
+The `RY` gate can prepare:
+
+```python
 theta = np.pi / 3
 
 qc.ry(theta, 0)
+```
 
-which creates:
+which gives:
 
-|ψ⟩ = cos(theta/2)|0⟩ + sin(theta/2)|1⟩
-🔍 Statevector Verification
+**|ψ⟩ = cos(θ/2)|0⟩ + sin(θ/2)|1⟩**
 
-A future version of this project will compare the original quantum
-state with Bob's recovered quantum state using the simulator's
-statevector representation.
+This allows testing states beyond `|0⟩`, `|1⟩`, and `|+⟩`.
 
-The goal is to verify:
+---
 
-Original state = Bob's recovered state
+# 🔍 18. Statevector Verification
 
-using a quantitative measure such as state fidelity.
+Measurement counts are useful, but they do not directly compare the complete quantum states.
+
+A future version of this project will use **statevector verification**.
+
+The idea is:
+
+**Prepare original state**
+
+↓
+
+**Teleport the state**
+
+↓
+
+**Obtain Bob's statevector**
+
+↓
+
+**Compare the original and Bob's state**
 
 For two pure states, fidelity can be written as:
 
-F = |⟨ψoriginal|ψBob⟩|²
+**F = |⟨ψ_original|ψ_Bob⟩|²**
 
-For an ideal noiseless simulation, the expected fidelity is:
+For an ideal noiseless teleportation circuit:
 
-F = 1
+**F = 1**
 
-This is a planned extension of the current measurement-based
-implementation.
+This will provide quantitative verification of the teleportation process.
 
-🚀 Future Improvements
+---
 
-The project will be extended in several stages.
+# 🚀 19. Future Improvements
 
-Version 1 — Completed
- Three-qubit teleportation circuit
- Bell-state generation
- Alice's Bell measurement
- Classical measurement results
- Conditional X/Z corrections
- Bob's final measurement
- Qiskit Aer simulation
-Version 2 — Planned
- Arbitrary single-qubit state preparation
- Statevector verification
- Fidelity calculation
- Bloch-sphere visualization
-Version 3 — Planned
- Quantum-state tomography
- Noise simulation
- Decoherence effects
- Error analysis
- Comparison between ideal and noisy teleportation
-Version 4 — Planned
- Execution on real quantum hardware
- Hardware noise comparison
- Transpilation analysis
- Gate-count and circuit-depth analysis
-🛠️ Technologies Used
-Python
-Quantum information
-Quantum mechanics
-Quantum Teleportation
-Qiskit
-Qiskit Aer
-NumPy
+## Completed
+
+- [x] Three-qubit teleportation circuit
+- [x] Bell-state generation
+- [x] Entanglement
+- [x] Alice's Bell-basis operations
+- [x] Alice's measurement
+- [x] Classical feed-forward
+- [x] Conditional X correction
+- [x] Conditional Z correction
+- [x] Bob's final measurement
+- [x] Qiskit Aer simulation
+
+## Planned
+
+- [ ] Arbitrary single-qubit state preparation
+- [ ] Statevector verification
+- [ ] Fidelity calculation
+- [ ] Bloch-sphere visualization
+- [ ] Quantum-state tomography
+- [ ] Noise simulation
+- [ ] Decoherence analysis
+- [ ] Error analysis
+- [ ] Circuit-depth analysis
+- [ ] Gate-count analysis
+- [ ] Execution on real quantum hardware
+- [ ] Comparison between ideal simulation and real hardware
+
+---
+
+# 🧪 20. What I Learned
+
+Building this project helped me understand quantum teleportation from both the **physics** and **programming** perspectives.
+
+The main concepts I explored were:
+
+- Qubits
+- Superposition
+- Quantum gates
+- Entanglement
+- Bell states
+- Bell-basis measurement
+- Classical bits
+- Conditional quantum operations
+- Quantum measurement
+- Quantum circuit simulation
+
+The complete conceptual flow is:
+
+**Qubit**
+
+↓
+
+**Superposition**
+
+↓
+
+**Entanglement**
+
+↓
+
+**Bell measurement**
+
+↓
+
+**Classical information**
+
+↓
+
+**Conditional quantum operations**
+
+↓
+
+**Recovered quantum state**
+
+---
+
+# 🛠️ 21. Technologies Used
+
+- **Python**
+- **Qiskit**
+- **Qiskit Aer**
+- **NumPy**
+
+---
+
+# 📁 22. Project Structure
+
+```text
+quantum-teleportation-simulator/
+│
+├── README.md
+├── requirements.txt
+├── LICENSE
+│
+├── src/
+│   └── quantum_teleportation.py
+│
+├── images/
+│   ├── teleportation_circuit.png
+│   ├── teleportation_code.png
+│   ├── teleportation_principle.png
+│   └── simulation_results.png
+│
+└── results/
+    └── example_output.txt
+```
+
+---
+
+# ▶️ 23. How to Run
+
+## Clone the repository
+
+```bash
+git clone https://github.com/YOUR-USERNAME/quantum-teleportation-simulator.git
+```
+
+## Enter the project directory
+
+```bash
+cd quantum-teleportation-simulator
+```
+
+## Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Run the simulator
+
+```bash
+python src/quantum_teleportation.py
+```
+
+---
+
+# 📦 24. Requirements
+
+Create a file named `requirements.txt` with:
+
+```text
+qiskit
+qiskit-aer
+numpy
+```
+
+Then install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# 🖼️ 25. Project Images
+
+## Quantum Teleportation Circuit
+
+![Quantum Teleportation Circuit](images/teleportation_circuit.png)
+
+## Qiskit Implementation
+
+![Qiskit Implementation](images/teleportation_code.png)
+
+## Quantum Teleportation Principle
+
+![Quantum Teleportation Principle](images/teleportation_principle.png)
+
+---
+
+# 👨‍💻 Author
+
+## Prince Prajapati
+
+Integrated MSc Physics Student
+
+### Interests
+
+- Quantum Computing
+- Quantum Information
+- Quantum Mechanics
+- Quantum Algorithms
+- Python
+- Qiskit
+
+---
+
+# 📌 26. Project Status
+
+**🟢 Basic Quantum Teleportation Simulation Completed**
+
+The current version implements the ideal quantum teleportation protocol using a Qiskit simulator.
+
+The current implementation demonstrates teleportation of the **|+⟩ state**.
+
+The next development stage will focus on:
+
+**Arbitrary-state preparation → Statevector verification → Fidelity → Visualization → Noise analysis → Real quantum hardware**
+
+---
+
+## ⭐ Explore and Experiment
+
+This project is primarily an educational implementation.
+
+The goal is to understand the underlying physics and how the theoretical quantum teleportation protocol maps onto an executable Qiskit circuit.
